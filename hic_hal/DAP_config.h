@@ -113,7 +113,21 @@ Provides definitions about:
 
 ///@}
 
-
+#ifdef STM32F469xx
+static __inline void pin_out_init(GPIO_TypeDef* GPIOx, uint8_t pin_bit)
+{
+    if(pin_bit >= 8)
+    {
+        GPIOx->CRH &= ~(0x0000000F << ((pin_bit-8) << 2));
+        GPIOx->CRH |= ( ((uint32_t)(0x00|0x03) & 0x0F) << ((pin_bit-8) << 2) );
+    }
+    else
+    {
+        GPIOx->CRL &= ~(0x0000000F << ((pin_bit) << 2));
+        GPIOx->CRL |= ( ((uint32_t)(0x00|0x03) & 0x0F) << ((pin_bit) << 2) );
+    }
+}
+#else ////define STM32F469xx
 static __inline void pin_out_init(GPIO_TypeDef* GPIOx, uint8_t pin_bit)
 {
     if(pin_bit >= 8)
@@ -171,6 +185,8 @@ static __inline void pin_in_init(GPIO_TypeDef* GPIOx, uint8_t pin_bit, uint8_t m
             GPIOx->BRR = (((uint32_t)0x01) << pin_bit);
     }
 }
+#endif //define STM32F469xx
+
 //**************************************************************************************************
 /**
 \defgroup DAP_Config_PortIO_gr CMSIS-DAP Hardware I/O Pin Access
